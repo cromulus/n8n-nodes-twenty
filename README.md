@@ -8,8 +8,10 @@ This is an n8n community node. It lets you use **Twenty CRM** in your n8n workfl
 
 [Installation](#installation)  
 [Operations](#operations)  
+[AI Tool Integration](#ai-tool-integration)  
 [Credentials](#credentials)  
 [Compatibility](#compatibility)  
+[Development and Testing](#development-and-testing)  
 [Resources](#resources)  
 [Credit](#credit)  
 [Version history](#version-history)  
@@ -58,6 +60,52 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 	- WorkflowVersion
 	- WorkspaceMember
 
+## AI Tool Integration
+
+The Twenty node can now be used as a tool in AI workflows, enabling n8n's AI nodes (including ChatGPT, Claude, and other agent-based systems) to leverage Twenty CRM capabilities. This is implemented through the new **Twenty AI Tool** node.
+
+### Features
+
+- **Get Tool Description**: Generates a standardized tool description that can be consumed by AI systems, including:
+  - Available resources (Person, Company, Task, Note, Opportunity)
+  - Operations for each resource
+  - Parameter specifications
+
+- **Execute Tool**: Allows AI agents to directly execute Twenty CRM operations by specifying:
+  - Target resource (e.g., Person, Company)
+  - Target operation (e.g., findOnePerson, createOneCompany)
+  - Parameters as a JSON object
+  - Query parameters as a JSON object
+
+### Usage with n8n AI Nodes
+
+1. Create a new workflow in n8n
+2. Add an AI node (like ChatGPT or Claude)
+3. Add the "Twenty AI Tool" node and set its operation to "Get Tool Description"
+4. Set which operations to include and the detail level (basic or detailed)
+5. Connect the Twenty AI Tool node to the AI node's "Tools" input
+6. Add another "Twenty AI Tool" node set to "Execute Tool" operation
+7. Connect this node to the AI node's "Tool Execution" output
+
+### Example Workflow Setup
+
+```
+[HTTP Trigger] → [AI Node (ChatGPT/Claude)] → [Output]
+                  ↑                      ↓
+[Twenty AI Tool]  →                     → [Twenty AI Tool]
+(Get Description)                         (Execute Tool)
+```
+
+With this setup, you can now prompt the AI to perform CRM operations like:
+- "Find all people with Gmail email addresses"
+- "Create a new company called Acme Inc"
+- "Update the task with ID xyz to mark it as completed"
+- "Find recent notes about customer onboarding"
+
+The AI will understand these requests, translate them into the appropriate Twenty CRM operations, and execute them through the tool integration.
+
+This allows for natural language interaction with your CRM data, enabling more intuitive access and manipulation of your customer information through AI-powered interfaces.
+
 ## Credentials
 
 Generate an API key in Twenty by following the [Twenty docs](https://twenty.com/user-guide/section/functions/api-webhooks). In summary, create an API key in the Settings -> Developers section.
@@ -68,12 +116,47 @@ Copy the API key. Click 'Add Credential' in n8n and search for 'Twenty API'. Pro
 
 Compatible and tested with Twenty v0.40.7 and n8n v1.9.3.
 
+## Development and Testing
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies with `pnpm install`
+3. Build the project with `pnpm build`
+
+### Running Tests
+
+The project includes Jest tests to verify functionality:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests with watch mode for development
+pnpm test:watch
+
+# Run tests with coverage report
+pnpm test:coverage
+```
+
+Test files are located in the `__tests__` directory and follow the same structure as the source files.
+
+### Other Commands
+
+- `pnpm dev` - Watch for changes and rebuild automatically
+- `pnpm format` - Format code with Prettier
+- `pnpm lint` - Run ESLint
+- `pnpm lintfix` - Run ESLint with automatic fixes
+
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
 * [Twenty developer documentation](https://twenty.com/developers/)
 
 ## Version history
+
+#### v0.1.0
+Added AI Tool integration to use Twenty CRM with AI agents as a tool
 
 #### v0.0.4
 Compatible with Twenty's updated API in v0.40.7

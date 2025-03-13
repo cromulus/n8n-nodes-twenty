@@ -2,6 +2,7 @@ export * from './GeneralDescription';
 export * from './ApiKeyDescription';
 export * from './AttachmentDescription';
 export * from './AuditLogDescription';
+export * from './AiToolDescription';
 export * from './BlocklistDescription';
 export * from './CalendarChannelDescription';
 export * from './CalendarChannelEventAssociationDescription';

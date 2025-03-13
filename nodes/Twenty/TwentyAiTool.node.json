@@ -1,0 +1,30 @@
+{
+	"node": "n8n-nodes-base.twentyAiTool",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Productivity",
+		"AI",
+		"CRM"
+	],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://docs.twenty.com/developer/api/authentication"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://docs.twenty.com/developer/api/overview"
+			}
+		]
+	},
+	"subcategories": {
+		"AI": [
+			"Tools"
+		],
+		"CRM": [
+			"Twenty"
+		]
+	}
+}
