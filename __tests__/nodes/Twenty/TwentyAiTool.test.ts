@@ -104,7 +104,7 @@ describe('TwentyAiTool Node', () => {
       // Verify that twentyApiRequest was called with the correct parameters
       expect(GenericFunctions.twentyApiRequest).toHaveBeenCalledWith(
         'GET',
-        '/persons',
+        '/people',
         expect.any(Object),
         expect.any(Object)
       );
@@ -112,6 +112,61 @@ describe('TwentyAiTool Node', () => {
       // Verify results
       expect(result).toBeDefined();
       expect(result[0]).toHaveLength(1);
+    });
+
+    it('should handle custom operations like search', async () => {
+      // Mock specific parameters for this test
+      mockExecute.getNodeParameter.mockImplementation(
+        (parameterName: string, itemIndex: number, fallbackValue?: any, options?: IGetNodeParameterOptions) => {
+          if (parameterName === 'operation' && itemIndex === 0) return 'executeTool';
+          if (parameterName === 'targetResource' && itemIndex === 0) return 'company';
+          if (parameterName === 'targetOperation' && itemIndex === 0) return 'searchCompanies';
+          if (parameterName === 'parameters' && itemIndex === 0) return '{"query": "tech"}';
+          if (parameterName === 'queryParameters' && itemIndex === 0) return '{"limit": 10}';
+          return fallbackValue;
+        }
+      );
+
+      const result = await twentyAiToolNode.execute.call(mockExecute);
+
+      // Verify that twentyApiRequest was called with the correct parameters
+      expect(GenericFunctions.twentyApiRequest).toHaveBeenCalledWith(
+        'GET',
+        '/companies/search',
+        expect.any(Object),
+        expect.objectContaining({ limit: 10 })
+      );
+      
+      // Verify results
+      expect(result).toBeDefined();
+      expect(result[0]).toHaveLength(1);
+    });
+    
+    it('should handle resources with irregular plurals', async () => {
+      // Mock specific parameters for this test
+      mockExecute.getNodeParameter.mockImplementation(
+        (parameterName: string, itemIndex: number, fallbackValue?: any, options?: IGetNodeParameterOptions) => {
+          if (parameterName === 'operation' && itemIndex === 0) return 'executeTool';
+          if (parameterName === 'targetResource' && itemIndex === 0) return 'opportunity';
+          if (parameterName === 'targetOperation' && itemIndex === 0) return 'findManyOpportunities';
+          if (parameterName === 'parameters' && itemIndex === 0) return '{}';
+          if (parameterName === 'queryParameters' && itemIndex === 0) return '{}';
+          return fallbackValue;
+        }
+      );
+
+      const result = await twentyAiToolNode.execute.call(mockExecute);
+
+      // Verify that twentyApiRequest was called with the correct parameters
+      expect(GenericFunctions.twentyApiRequest).toHaveBeenCalledWith(
+        'GET',
+        '/opportunities',
+        expect.any(Object),
+        expect.any(Object)
+      );
+      
+      // Verify results
+      expect(result).toBeDefined();
     });
   });
 });

@@ -1,6 +1,6 @@
 {
-  "name": "n8n-nodes-twenty",
-  "version": "0.1.0",
+  "name": "@cromulus/n8n-nodes-twenty",
+  "version": "0.2.0",
   "description": "n8n nodes to call Twenty CRM's API and integrate with AI workflows",
   "keywords": [
     "n8n-community-node-package",
@@ -11,14 +11,17 @@
     "tools"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/cromulus/n8n-nodes-twenty",
   "author": {
     "name": "S Hodgson",
     "email": "steven@hodgolabs.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shodgson/n8n-nodes-twenty"
+    "url": "git+https://github.com/cromulus/n8n-nodes-twenty.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "engines": {
     "node": ">=18.10",

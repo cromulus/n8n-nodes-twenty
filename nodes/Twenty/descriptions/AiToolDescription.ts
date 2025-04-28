@@ -26,7 +26,7 @@ export const aiToolOperations: INodeProperties[] = [
 				name: 'Execute Tool',
 				value: 'executeTool',
 				description: 'Execute a Twenty CRM operation through the AI tool interface',
-				action: 'Execute a Twenty CRM operation through the AI tool interface',
+				action: 'Execute a twenty crm operation through the ai tool interface',
 			},
 		],
 		default: 'getToolDescription',
@@ -43,24 +43,148 @@ export const aiToolFields: INodeProperties[] = [
 		type: 'multiOptions',
 		options: [
 			{
-				name: 'Person Operations',
-				value: 'person',
+				name: 'API Key Operations',
+				value: 'apiKey',
+			},
+			{
+				name: 'Attachment Operations',
+				value: 'attachment',
+			},
+			{
+				name: 'Audit Log Operations',
+				value: 'auditLog',
+			},
+			{
+				name: 'Blocklist Operations',
+				value: 'blocklist',
+			},
+			{
+				name: 'Calendar Channel Operations',
+				value: 'calendarChannel',
+			},
+			{
+				name: 'Calendar Channel Event Association Operations',
+				value: 'calendarChannelEventAssociation',
+			},
+			{
+				name: 'Calendar Event Operations',
+				value: 'calendarEvent',
+			},
+			{
+				name: 'Calendar Event Participant Operations',
+				value: 'calendarEventParticipant',
 			},
 			{
 				name: 'Company Operations',
 				value: 'company',
 			},
 			{
-				name: 'Task Operations',
-				value: 'task',
+				name: 'Connected Account Operations',
+				value: 'connectedAccount',
+			},
+			{
+				name: 'Favorite Operations',
+				value: 'favorite',
+			},
+			{
+				name: 'Favorite Folder Operations',
+				value: 'favoriteFolder',
+			},
+			{
+				name: 'Message Operations',
+				value: 'message',
+			},
+			{
+				name: 'Message Channel Operations',
+				value: 'messageChannel',
+			},
+			{
+				name: 'Message Channel Message Association Operations',
+				value: 'messageChannelMessageAssociation',
+			},
+			{
+				name: 'Message Participant Operations',
+				value: 'messageParticipant',
+			},
+			{
+				name: 'Message Thread Operations',
+				value: 'messageThread',
 			},
 			{
 				name: 'Note Operations',
 				value: 'note',
 			},
 			{
+				name: 'Note Target Operations',
+				value: 'noteTarget',
+			},
+			{
 				name: 'Opportunity Operations',
 				value: 'opportunity',
+			},
+			{
+				name: 'Person Operations',
+				value: 'person',
+			},
+			{
+				name: 'Task Operations',
+				value: 'task',
+			},
+			{
+				name: 'Task Target Operations',
+				value: 'taskTarget',
+			},
+			{
+				name: 'Timeline Activity Operations',
+				value: 'timelineActivity',
+			},
+			{
+				name: 'View Operations',
+				value: 'view',
+			},
+			{
+				name: 'View Field Operations',
+				value: 'viewField',
+			},
+			{
+				name: 'View Filter Operations',
+				value: 'viewFilter',
+			},
+			{
+				name: 'View Filter Group Operations',
+				value: 'viewFilterGroup',
+			},
+			{
+				name: 'View Group Operations',
+				value: 'viewGroup',
+			},
+			{
+				name: 'View Sort Operations',
+				value: 'viewSort',
+			},
+			{
+				name: 'Webhook Operations',
+				value: 'webhook',
+			},
+			{
+				name: 'Workflow Operations',
+				value: 'workflow',
+			},
+			{
+				name: 'Workflow Event Listener Operations',
+				value: 'workflowEventListener',
+			},
+			{
+				name: 'Workflow Run Operations',
+				value: 'workflowRun',
+			},
+			{
+				name: 'Workflow Version Operations',
+				value: 'workflowVersion',
+			},
+			{
+				name: 'Workspace Member Operations',
+				value: 'workspaceMember',
 			},
 		],
 		default: ['person', 'company', 'task', 'note', 'opportunity'],
@@ -115,29 +239,152 @@ export const aiToolFields: INodeProperties[] = [
 		type: 'options',
 		options: [
 			{
-				name: 'Person',
-				value: 'person',
+				name: 'API Key',
+				value: 'apiKey',
+			},
+			{
+				name: 'Attachment',
+				value: 'attachment',
+			},
+			{
+				name: 'Audit Log',
+				value: 'auditLog',
+			},
+			{
+				name: 'Blocklist',
+				value: 'blocklist',
+			},
+			{
+				name: 'Calendar Channel',
+				value: 'calendarChannel',
+			},
+			{
+				name: 'Calendar Channel Event Association',
+				value: 'calendarChannelEventAssociation',
+			},
+			{
+				name: 'Calendar Event',
+				value: 'calendarEvent',
+			},
+			{
+				name: 'Calendar Event Participant',
+				value: 'calendarEventParticipant',
 			},
 			{
 				name: 'Company',
 				value: 'company',
 			},
 			{
-				name: 'Task',
-				value: 'task',
+				name: 'Connected Account',
+				value: 'connectedAccount',
+			},
+			{
+				name: 'Favorite',
+				value: 'favorite',
+			},
+			{
+				name: 'Favorite Folder',
+				value: 'favoriteFolder',
+			},
+			{
+				name: 'Message',
+				value: 'message',
+			},
+			{
+				name: 'Message Channel',
+				value: 'messageChannel',
+			},
+			{
+				name: 'Message Channel Message Association',
+				value: 'messageChannelMessageAssociation',
+			},
+			{
+				name: 'Message Participant',
+				value: 'messageParticipant',
+			},
+			{
+				name: 'Message Thread',
+				value: 'messageThread',
 			},
 			{
 				name: 'Note',
 				value: 'note',
 			},
 			{
+				name: 'Note Target',
+				value: 'noteTarget',
+			},
+			{
 				name: 'Opportunity',
 				value: 'opportunity',
+			},
+			{
+				name: 'Person',
+				value: 'person',
+			},
+			{
+				name: 'Task',
+				value: 'task',
+			},
+			{
+				name: 'Task Target',
+				value: 'taskTarget',
+			},
+			{
+				name: 'Timeline Activity',
+				value: 'timelineActivity',
+			},
+			{
+				name: 'View',
+				value: 'view',
+			},
+			{
+				name: 'View Field',
+				value: 'viewField',
+			},
+			{
+				name: 'View Filter',
+				value: 'viewFilter',
+			},
+			{
+				name: 'View Filter Group',
+				value: 'viewFilterGroup',
+			},
+			{
+				name: 'View Group',
+				value: 'viewGroup',
+			},
+			{
+				name: 'View Sort',
+				value: 'viewSort',
+			},
+			{
+				name: 'Webhook',
+				value: 'webhook',
+			},
+			{
+				name: 'Workflow',
+				value: 'workflow',
+			},
+			{
+				name: 'Workflow Event Listener',
+				value: 'workflowEventListener',
+			},
+			{
+				name: 'Workflow Run',
+				value: 'workflowRun',
+			},
+			{
+				name: 'Workflow Version',
+				value: 'workflowVersion',
+			},
+			{
+				name: 'Workspace Member',
+				value: 'workspaceMember',
 			},
 		],
 		default: 'person',
 		required: true,
-		description: 'Which Twenty CRM resource to operate on',
 		displayOptions: {
 			show: {
 				resource: [

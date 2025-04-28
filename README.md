@@ -18,7 +18,30 @@ This is an n8n community node. It lets you use **Twenty CRM** in your n8n workfl
 
 ## Installation
 
+### Standard Installation
+
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+
+### Installing from GitHub Packages
+
+This package is also available as `@cromulus/n8n-nodes-twenty` from GitHub Packages:
+
+1. Create a `.npmrc` file with GitHub authentication:
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+@cromulus:registry=https://npm.pkg.github.com
+```
+
+2. Install the package:
+
+```bash
+npm install -g @cromulus/n8n-nodes-twenty
+```
+
+Replace `YOUR_GITHUB_TOKEN` with a GitHub Personal Access Token that has the `read:packages` permission.
+
+3. In n8n, the custom nodes will be available for use with all AI agent nodes.
 
 ## Operations
 
@@ -67,15 +90,27 @@ The Twenty node can now be used as a tool in AI workflows, enabling n8n's AI nod
 ### Features
 
 - **Get Tool Description**: Generates a standardized tool description that can be consumed by AI systems, including:
-  - Available resources (Person, Company, Task, Note, Opportunity)
+  - All available resources in Twenty CRM (30+ resource types)
   - Operations for each resource
-  - Parameter specifications
+  - Detailed parameter specifications
 
 - **Execute Tool**: Allows AI agents to directly execute Twenty CRM operations by specifying:
-  - Target resource (e.g., Person, Company)
-  - Target operation (e.g., findOnePerson, createOneCompany)
+  - Target resource (e.g., Person, Company, Task, Note, Calendar, etc.)
+  - Target operation (e.g., findOnePerson, createOneCompany, updateOneTask)
   - Parameters as a JSON object
   - Query parameters as a JSON object
+
+### Supported Resources
+
+The Twenty AI Tool supports all resources available in the Twenty CRM API:
+
+- Person, Company, Task, Note, Opportunity
+- Message, MessageThread, MessageChannel
+- CalendarEvent, CalendarChannel
+- Attachment, Favorite, FavoriteFolder
+- View, ViewField, ViewFilter, ViewSort
+- Webhook, Workflow, WorkflowRun
+- And many more...
 
 ### Usage with n8n AI Nodes
 
@@ -101,6 +136,9 @@ With this setup, you can now prompt the AI to perform CRM operations like:
 - "Create a new company called Acme Inc"
 - "Update the task with ID xyz to mark it as completed"
 - "Find recent notes about customer onboarding"
+- "List all calendar events for next week"
+- "Show me all message threads with a specific customer"
+- "Create a new webhook for opportunity updates"
 
 The AI will understand these requests, translate them into the appropriate Twenty CRM operations, and execute them through the tool integration.
 
