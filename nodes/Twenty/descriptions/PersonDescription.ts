@@ -19,42 +19,43 @@ export const personOperations: INodeProperties[] = [
 			{
 				name: 'Create Many People',
 				value: 'createManyPeople',
+				description: 'Create multiple contact records in batch. Useful for importing contact data from external sources or bulk operations.',
 				action: 'Create many people',
 			},
 			{
 				name: 'Create One Person',
 				value: 'createOnePerson',
-				description: '**order_by**, **filter**, **limit**, **depth**, **starting_after** or **ending_before** can be provided to request your **people**',
+				description: 'Create a single new contact record with details like name, email, phone, company affiliation, and social profiles. Supports filtering, sorting, and depth control for related data.',
 				action: 'Create one person',
 			},
 			{
 				name: 'Delete One Person',
 				value: 'deleteOnePerson',
-				description: '**depth** can be provided to request your **person**',
+				description: 'Permanently delete a specific contact record by ID. Use with caution as this cannot be undone. Depth parameter controls related data inclusion',
 				action: 'Delete one person',
 			},
 			{
 				name: 'Find Many People',
 				value: 'findManyPeople',
-				description: '**order_by**, **filter**, **limit**, **depth**, **starting_after** or **ending_before** can be provided to request your **people**',
+				description: 'Search and retrieve multiple contacts with advanced filtering (by name, email, company, etc.), sorting, pagination, and relationship depth control',
 				action: 'Find many people',
 			},
 			{
 				name: 'Find One Person',
 				value: 'findOnePerson',
-				description: '**depth** can be provided to request your **person**',
+				description: 'Retrieve a specific contact by ID with full details including related companies, opportunities, tasks, and activities. Depth parameter controls relationship inclusion.',
 				action: 'Find one person',
 			},
 			{
 				name: 'Find Person Duplicates',
 				value: 'findPersonDuplicates',
-				description: '**depth** can be provided to request your **person**',
+				description: 'Identify potential duplicate contact records based on name, email, or other matching criteria. Helps maintain data quality and avoid redundancy.',
 				action: 'Find person duplicates',
 			},
 			{
 				name: 'Update One Person',
 				value: 'updateOnePerson',
-				description: '**depth** can be provided to request your **person**',
+				description: 'Modify an existing contact record. Update personal information like name, contact details, job title, company association, and social profiles.',
 				action: 'Update one person',
 			},
 		],
@@ -142,7 +143,7 @@ export const personFields: INodeProperties[] = [
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//         person: createOnePerson
 	// ----------------------------------------
@@ -467,7 +468,7 @@ default: '',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//         person: deleteOnePerson
 	// ----------------------------------------
@@ -505,7 +506,7 @@ default: '',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//          person: findManyPeople
 	// ----------------------------------------
@@ -604,7 +605,7 @@ default: '',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//          person: findOnePerson
 	// ----------------------------------------
@@ -683,7 +684,7 @@ default: '',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//       person: findPersonDuplicates
 	// ----------------------------------------
@@ -1020,7 +1021,7 @@ description: 'Contact’s company ID foreign key',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//         person: updateOnePerson
 	// ----------------------------------------

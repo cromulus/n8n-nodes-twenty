@@ -19,6 +19,7 @@ export const generalOperations: INodeProperties[] = [
 			{
 				name: 'Get Open Api Schema',
 				value: 'getOpenApiSchema',
+				description: 'Retrieve the OpenAPI schema for the Twenty CRM API. This provides detailed information about all available endpoints, data models, and field definitions.',
 				action: 'Get open api schema',
 			},
 		],

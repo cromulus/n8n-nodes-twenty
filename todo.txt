@@ -1,0 +1,19 @@
+TODO: Implement Twenty as an AI Tool
+
+High-Level Tasks:
+[x] Define the AI Tool Interface
+[x] Create a TwentyAiTool node that implements the AI Tool interface
+[x] Expose Twenty's functionality through the AI Tool interface
+[x] Create description and metadata for the AI Tool
+[ ] Test integration with AI/LangChain nodes
+[x] Update documentation to reflect AI Tool capabilities
+
+Implementation Details:
+[x] Create TwentyAiTool.node.ts file
+[x] Create TwentyAiTool.node.json for node metadata
+[x] Define AiToolDescription.ts for exposing operations
+[x] Register the new node in package.json
+[x] Implement methods to integrate with LangChain/AI workflows
+[ ] Ensure proper error handling and parameter validation
+[x] Add testing infrastructure
+[x] Implement unit tests for AI Tool functionality

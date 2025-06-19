@@ -19,42 +19,43 @@ export const companyOperations: INodeProperties[] = [
 			{
 				name: 'Create Many Companies',
 				value: 'createManyCompanies',
+				description: 'Create multiple companies in batch. Useful for importing company data from external sources or bulk operations.',
 				action: 'Create many companies',
 			},
 			{
 				name: 'Create One Company',
 				value: 'createOneCompany',
-				description: '**order_by**, **filter**, **limit**, **depth**, **starting_after** or **ending_before** can be provided to request your **companies**',
+				description: 'Create a single new company record with details like name, domain, address, industry, and employees count. Supports filtering, sorting, and depth control for related data.',
 				action: 'Create one company',
 			},
 			{
 				name: 'Delete One Company',
 				value: 'deleteOneCompany',
-				description: '**depth** can be provided to request your **company**',
+				description: 'Permanently delete a specific company record by ID. Use with caution as this cannot be undone. Depth parameter controls related data inclusion',
 				action: 'Delete one company',
 			},
 			{
 				name: 'Find Company Duplicates',
 				value: 'findCompanyDuplicates',
-				description: '**depth** can be provided to request your **company**',
+				description: 'Identify potential duplicate company records based on name, domain, or other matching criteria. Helps maintain data quality and avoid redundancy.',
 				action: 'Find company duplicates',
 			},
 			{
 				name: 'Find Many Companies',
 				value: 'findManyCompanies',
-				description: '**order_by**, **filter**, **limit**, **depth**, **starting_after** or **ending_before** can be provided to request your **companies**',
+				description: 'Search and retrieve multiple companies with advanced filtering (by name, industry, size, etc.), sorting, pagination, and relationship depth control',
 				action: 'Find many companies',
 			},
 			{
 				name: 'Find One Company',
 				value: 'findOneCompany',
-				description: '**depth** can be provided to request your **company**',
+				description: 'Retrieve a specific company by ID with full details including related contacts, opportunities, and activities. Depth parameter controls relationship inclusion.',
 				action: 'Find one company',
 			},
 			{
 				name: 'Update One Company',
 				value: 'updateOneCompany',
-				description: '**depth** can be provided to request your **company**',
+				description: 'Modify an existing company record. Update company information like name, contact details, industry, employee count, and other business data.',
 				action: 'Update one company',
 			},
 		],
@@ -142,7 +143,7 @@ export const companyFields: INodeProperties[] = [
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//        company: createOneCompany
 	// ----------------------------------------
@@ -509,7 +510,7 @@ default: '',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//        company: deleteOneCompany
 	// ----------------------------------------
@@ -547,7 +548,7 @@ default: '',
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//      company: findCompanyDuplicates
 	// ----------------------------------------
@@ -926,7 +927,7 @@ description: 'Your team member responsible for managing the company account ID f
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//        company: findManyCompanies
 	// ----------------------------------------
@@ -1025,7 +1026,7 @@ description: 'Your team member responsible for managing the company account ID f
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//         company: findOneCompany
 	// ----------------------------------------
@@ -1104,7 +1105,7 @@ description: 'Your team member responsible for managing the company account ID f
 				},
 			},
 		},
-	
+
 	// ----------------------------------------
 	//        company: updateOneCompany
 	// ----------------------------------------
