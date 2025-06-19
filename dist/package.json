@@ -1,0 +1,57 @@
+{
+    "name": "n8n-nodes-twenty",
+    "version": "0.0.4",
+    "description": "Comprehensive n8n community node for Twenty CRM - manage companies, contacts, opportunities, tasks, notes, and more with full CRUD operations and AI tool capabilities",
+    "keywords": [
+        "n8n-community-node-package"
+    ],
+    "license": "MIT",
+    "homepage": "",
+    "author": {
+        "name": "S Hodgson",
+        "email": "steven@hodgolabs.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/shodgson/n8n-nodes-twenty"
+    },
+    "engines": {
+        "node": ">=18.10",
+        "pnpm": ">=9.1"
+    },
+    "packageManager": "pnpm@9.1.4",
+    "main": "index.js",
+    "scripts": {
+        "preinstall": "npx only-allow pnpm",
+        "build": "tsc && gulp build:icons",
+        "dev": "tsc --watch",
+        "format": "prettier nodes credentials --write",
+        "lint": "eslint nodes credentials package.json",
+        "lintfix": "eslint nodes credentials package.json --fix",
+        "prepublishOnly": "pnpm build && pnpm lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    },
+    "files": [
+        "dist"
+    ],
+    "n8n": {
+        "n8nNodesApiVersion": 1,
+        "credentials": [
+            "dist/credentials/TwentyApi.credentials.js"
+        ],
+        "nodes": [
+            "dist/nodes/Twenty/Twenty.node.js"
+        ]
+    },
+    "devDependencies": {
+        "@typescript-eslint/parser": "^7.15.0",
+        "eslint": "^8.57.1",
+        "eslint-plugin-n8n-nodes-base": "^1.16.1",
+        "gulp": "^4.0.2",
+        "n8n-workflow": "*",
+        "prettier": "^3.3.2",
+        "typescript": "^5.5.3"
+    },
+    "peerDependencies": {
+        "n8n-workflow": "*"
+    }
+}
