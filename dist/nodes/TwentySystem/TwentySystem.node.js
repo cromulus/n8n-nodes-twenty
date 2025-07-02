@@ -3,17 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwentySystem = void 0;
 const zod_1 = require("zod");
 const GenericFunctions_1 = require("../Twenty/GenericFunctions");
-const systemResourceEnum = zod_1.z.enum([
-    'workflow',
-    'webhook',
-    'apiKey',
-    'view',
-    'connectedAccount',
-    'workspaceMember'
-]);
 const operationEnum = zod_1.z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
 const inputSchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to operate on'),
+    resource: zod_1.z.string().describe('The system resource type to operate on (e.g., workflow, webhook, apiKey, view, connectedAccount, workspaceMember)'),
     operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
     id: zod_1.z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
     data: zod_1.z.union([zod_1.z.record(zod_1.z.any()), zod_1.z.array(zod_1.z.record(zod_1.z.any()))]).optional().describe('Record data as JSON object or array of objects (required for create, update, createMany operations)'),

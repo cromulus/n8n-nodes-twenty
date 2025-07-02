@@ -13,11 +13,57 @@ import { twentyApiRequest } from '../Twenty/GenericFunctions';
 const tasksSalesResourceEnum = z.enum(['opportunity', 'task', 'note', 'taskTarget', 'noteTarget']);
 const operationEnum = z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
 
+// Detailed schemas for specific resources
+const opportunitySchema = z.object({
+	name: z.string().describe('Opportunity name'),
+	amount: z.number().optional().describe('Deal amount/value'),
+	stage: z.string().optional().describe('Sales stage (e.g., PROSPECTING, MEETING, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST)'),
+	probability: z.number().min(0).max(100).optional().describe('Win probability percentage (0-100)'),
+	expectedCloseDate: z.string().optional().describe('Expected close date (ISO format)'),
+	description: z.string().optional().describe('Opportunity description'),
+	companyId: z.string().optional().describe('Associated company ID'),
+	personId: z.string().optional().describe('Associated person/contact ID'),
+	ownerId: z.string().optional().describe('Opportunity owner/responsible person ID'),
+}).describe('Opportunity/deal record data');
+
+const taskSchema = z.object({
+	title: z.string().describe('Task title'),
+	body: z.string().optional().describe('Task description/body'),
+	status: z.string().optional().describe('Task status (e.g., TODO, IN_PROGRESS, DONE)'),
+	dueAt: z.string().optional().describe('Due date/time (ISO format)'),
+	assigneeId: z.string().optional().describe('Assigned person ID'),
+	authorId: z.string().optional().describe('Task creator ID'),
+	position: z.number().optional().describe('Task position/order'),
+}).describe('Task record data');
+
+const noteSchema = z.object({
+	title: z.string().describe('Note title'),
+	body: z.string().optional().describe('Note content/body'),
+	authorId: z.string().optional().describe('Note author ID'),
+	position: z.number().optional().describe('Note position/order'),
+}).describe('Note record data');
+
+// Generic schema for target associations
+const targetSchema = z.object({
+	targetId: z.string().describe('Target entity ID'),
+	taskId: z.string().optional().describe('Associated task ID (for taskTarget)'),
+	noteId: z.string().optional().describe('Associated note ID (for noteTarget)'),
+}).describe('Target association data');
+
+// Conditional data schema based on resource
+const dataSchema = z.union([
+	opportunitySchema,
+	taskSchema,
+	noteSchema,
+	targetSchema,
+	z.array(z.union([opportunitySchema, taskSchema, noteSchema, targetSchema]))
+]).optional().describe('Record data - structure varies by resource type');
+
 const inputSchema = z.object({
 	resource: tasksSalesResourceEnum.describe('The tasks/sales resource type to operate on'),
 	operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
 	id: z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
-	data: z.union([z.record(z.any()), z.array(z.record(z.any()))]).optional().describe('Record data as JSON object or array of objects (required for create, update, createMany operations)'),
+	data: dataSchema,
 	limit: z.number().min(1).max(100).optional().describe('Maximum number of records to return for getMany (1-100, default: 50)'),
 	filter: z.record(z.any()).optional().describe('Filter conditions as JSON object for getMany operation'),
 });
