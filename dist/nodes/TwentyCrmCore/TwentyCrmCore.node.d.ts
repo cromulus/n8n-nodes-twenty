@@ -2,6 +2,7 @@ import type { INodeExecutionData, IExecuteFunctions, INodeType, INodeTypeDescrip
 export declare class TwentyCrmCore implements INodeType {
     description: INodeTypeDescription & {
         usableAsTool?: boolean;
+        schema?: any;
     };
     methods: {
         listSearch: {

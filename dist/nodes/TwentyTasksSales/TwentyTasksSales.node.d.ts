@@ -2,6 +2,7 @@ import type { INodeExecutionData, IExecuteFunctions, INodeType, INodeTypeDescrip
 export declare class TwentyTasksSales implements INodeType {
     description: INodeTypeDescription & {
         usableAsTool?: boolean;
+        schema?: any;
     };
     execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]>;
 }

@@ -102,7 +102,6 @@ class ResourceDiscovery {
             return resourceNames.map(resource => this.createResourceInfo(resource));
         }
         catch (error) {
-            console.warn('Resource discovery failed, using fallback resources:', error.message);
             return this.getFallbackResources();
         }
     }

@@ -21,17 +21,17 @@ export interface OperationInfo {
 const RESOURCE_CATEGORIES: Record<string, 'crm' | 'tasks' | 'communications' | 'system'> = {
 	// CRM Core
 	'companies': 'crm',
-	'people': 'crm', 
+	'people': 'crm',
 	'relationships': 'crm',
 	'attachments': 'crm',
-	
+
 	// Tasks & Sales
 	'opportunities': 'tasks',
 	'tasks': 'tasks',
 	'notes': 'tasks',
 	'taskTargets': 'tasks',
 	'noteTargets': 'tasks',
-	
+
 	// Communications
 	'messages': 'communications',
 	'messageThreads': 'communications',
@@ -44,7 +44,7 @@ const RESOURCE_CATEGORIES: Record<string, 'crm' | 'tasks' | 'communications' | '
 	'calendarChannelEventAssociations': 'communications',
 	'calendarEventParticipants': 'communications',
 	'timelineActivities': 'communications',
-	
+
 	// System
 	'workflows': 'system',
 	'workflowVersions': 'system',
@@ -77,7 +77,7 @@ export class ResourceDiscovery {
 	private static extractResourcesFromSchema(schema: IDataObject): string[] {
 		const resources: string[] = [];
 		const paths = schema.paths as IDataObject;
-		
+
 		if (!paths) return resources;
 
 		// Extract resources from API paths
@@ -97,7 +97,7 @@ export class ResourceDiscovery {
 
 	private static createResourceInfo(resource: string): ResourceInfo {
 		const category = RESOURCE_CATEGORIES[resource] || 'system';
-		
+
 		// Generate human-readable name
 		const name = resource
 			.replace(/([A-Z])/g, ' $1')
@@ -134,17 +134,17 @@ export class ResourceDiscovery {
 		try {
 			const schema = await this.fetchOpenApiSchema(context);
 			const resourceNames = this.extractResourcesFromSchema(schema);
-			
+
 			return resourceNames.map(resource => this.createResourceInfo(resource));
 		} catch (error) {
 			// Fallback to known resources if discovery fails
-			console.warn('Resource discovery failed, using fallback resources:', error.message);
+			// Resource discovery failed, using fallback resources
 			return this.getFallbackResources();
 		}
 	}
 
 	static async discoverResourcesByCategory(
-		context: IExecuteFunctions, 
+		context: IExecuteFunctions,
 		category: 'crm' | 'tasks' | 'communications' | 'system'
 	): Promise<ResourceInfo[]> {
 		const allResources = await this.discoverResources(context);

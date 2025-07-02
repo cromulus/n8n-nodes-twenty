@@ -8,12 +8,63 @@ import type {
 	INodeListSearchItems,
 	INodeListSearchResult,
 } from 'n8n-workflow';
+import { z } from 'zod';
 
 import { twentyApiRequest } from '../Twenty/GenericFunctions';
 import { ResourceDiscovery } from '../Twenty/ResourceDiscovery';
 
+// Zod schemas for AI Tool input validation
+const createSchema = z.object({
+	resource: z.string().describe('The Twenty CRM resource type to create (e.g., companies, people, opportunities)'),
+	operation: z.literal('create').describe('Create a new record'),
+	data: z.record(z.any()).describe('Record data as JSON object with the fields to create'),
+});
+
+const createManySchema = z.object({
+	resource: z.string().describe('The Twenty CRM resource type to create multiple records for'),
+	operation: z.literal('createMany').describe('Create multiple records in batch'),
+	data: z.array(z.record(z.any())).describe('Array of record data objects to create'),
+});
+
+const updateSchema = z.object({
+	resource: z.string().describe('The Twenty CRM resource type to update'),
+	operation: z.literal('update').describe('Update an existing record'),
+	id: z.string().describe('The unique ID of the record to update'),
+	data: z.record(z.any()).describe('Record data as JSON object with the fields to update'),
+});
+
+const getSchema = z.object({
+	resource: z.string().describe('The Twenty CRM resource type to retrieve'),
+	operation: z.literal('get').describe('Get a single record by ID'),
+	id: z.string().describe('The unique ID of the record to retrieve'),
+});
+
+const getManySchema = z.object({
+	resource: z.string().describe('The Twenty CRM resource type to query'),
+	operation: z.literal('getMany').describe('Query multiple records with filtering and sorting'),
+	limit: z.number().min(1).max(100).optional().describe('Maximum number of records to return (1-100, default: 20)'),
+	filter: z.record(z.any()).optional().describe('Filter conditions as JSON object using Twenty CRM filter syntax'),
+	orderBy: z.record(z.enum(['ASC', 'DESC'])).optional().describe('Sort order as JSON object with field names and direction'),
+});
+
+const deleteSchema = z.object({
+	resource: z.string().describe('The Twenty CRM resource type to delete from'),
+	operation: z.literal('delete').describe('Delete a record by ID'),
+	id: z.string().describe('The unique ID of the record to delete'),
+});
+
+// Union schema that includes all operations
+const inputSchema = z.discriminatedUnion('operation', [
+	createSchema,
+	createManySchema,
+	updateSchema,
+	getSchema,
+	getManySchema,
+	deleteSchema,
+]);
+
 export class TwentyUniversal implements INodeType {
-	description: INodeTypeDescription & { usableAsTool?: boolean } = {
+	description: INodeTypeDescription & { usableAsTool?: boolean; schema?: any } = {
 		displayName: 'Twenty CRM Universal',
 		name: 'twentyUniversal',
 		icon: 'file:twenty.svg',
@@ -22,6 +73,7 @@ export class TwentyUniversal implements INodeType {
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Universal node for Twenty CRM - access ALL resources dynamically discovered from your instance. Perfect for AI agents with full CRUD operations on any Twenty CRM entity including companies, people, opportunities, tasks, messages, workflows, and more. Resources are automatically loaded from your Twenty API.',
 		usableAsTool: true,
+		schema: inputSchema,
 		defaults: {
 			name: 'Twenty CRM Universal',
 		},
@@ -88,10 +140,10 @@ export class TwentyUniversal implements INodeType {
 						action: 'Create many records',
 					},
 					{
-						name: 'Update',
-						value: 'update',
-						description: 'Update an existing record by ID',
-						action: 'Update record',
+						name: 'Delete',
+						value: 'delete',
+						description: 'Delete a record by ID',
+						action: 'Delete record',
 					},
 					{
 						name: 'Get',
@@ -106,10 +158,10 @@ export class TwentyUniversal implements INodeType {
 						action: 'Get many records',
 					},
 					{
-						name: 'Delete',
-						value: 'delete',
-						description: 'Delete a record by ID',
-						action: 'Delete record',
+						name: 'Update',
+						value: 'update',
+						description: 'Update an existing record by ID',
+						action: 'Update record',
 					},
 				],
 				default: 'get',
@@ -151,10 +203,9 @@ export class TwentyUniversal implements INodeType {
 				},
 				typeOptions: {
 					minValue: 1,
-					maxValue: 100,
 				},
-				default: 20,
-				description: 'Maximum number of records to return (1-100)',
+				default: 50,
+				description: 'Max number of results to return',
 			},
 			{
 				displayName: 'Filter',
@@ -192,11 +243,11 @@ export class TwentyUniversal implements INodeType {
 			): Promise<INodeListSearchResult> {
 				try {
 					const resources = await ResourceDiscovery.discoverResources(this as any);
-					
+
 					// Group resources by category for better organization
 					const categorizedResults: INodeListSearchItems[] = [];
 					const categories = ['crm', 'tasks', 'communications', 'system'] as const;
-					
+
 					for (const category of categories) {
 						const categoryResources = resources.filter(r => r.category === category);
 						if (categoryResources.length > 0) {
@@ -207,13 +258,13 @@ export class TwentyUniversal implements INodeType {
 								communications: 'Communications',
 								system: 'System & Admin'
 							}[category];
-							
+
 							categorizedResults.push({
 								name: `━━━ ${categoryName} ━━━`,
 								value: `__category_${category}`,
 								description: '',
 							});
-							
+
 							// Add resources in this category
 							categoryResources.forEach(resource => {
 								categorizedResults.push({
@@ -230,24 +281,24 @@ export class TwentyUniversal implements INodeType {
 					// Return comprehensive fallback list
 					const fallbackResources = [
 						// CRM Core
-						{ name: '━━━ CRM Core ━━━', value: '__category_crm', description: '' },
+						{ name: '━━━ CRM Core ━━━', value: '__category_crm', description: 'CRM Core category header' },
 						{ name: 'Companies', value: 'companies', description: 'Manage company records and business entities' },
 						{ name: 'People', value: 'people', description: 'Manage individual contacts and people' },
 						{ name: 'Relationships', value: 'relationships', description: 'Manage relationships between entities' },
 						{ name: 'Attachments', value: 'attachments', description: 'Manage files and documents' },
-						
+
 						// Tasks & Sales
 						{ name: '━━━ Tasks & Sales ━━━', value: '__category_tasks', description: '' },
 						{ name: 'Opportunities', value: 'opportunities', description: 'Manage sales opportunities and deals' },
 						{ name: 'Tasks', value: 'tasks', description: 'Manage tasks and to-do items' },
 						{ name: 'Notes', value: 'notes', description: 'Manage notes and documentation' },
-						
-						// Communications  
+
+						// Communications
 						{ name: '━━━ Communications ━━━', value: '__category_comms', description: '' },
 						{ name: 'Messages', value: 'messages', description: 'Manage email messages and communications' },
 						{ name: 'Message Threads', value: 'messageThreads', description: 'Manage email conversation threads' },
 						{ name: 'Calendar Events', value: 'calendarEvents', description: 'Manage calendar events and meetings' },
-						
+
 						// System
 						{ name: '━━━ System & Admin ━━━', value: '__category_system', description: '' },
 						{ name: 'Workflows', value: 'workflows', description: 'Manage automated workflows and processes' },
@@ -255,7 +306,7 @@ export class TwentyUniversal implements INodeType {
 						{ name: 'API Keys', value: 'apiKeys', description: 'Manage API keys and authentication' },
 						{ name: 'Views', value: 'views', description: 'Manage custom views and displays' },
 					];
-					
+
 					return { results: fallbackResources };
 				}
 			},
@@ -270,10 +321,10 @@ export class TwentyUniversal implements INodeType {
 			try {
 				const resourceLocator = this.getNodeParameter('resource', i) as any;
 				const operation = this.getNodeParameter('operation', i) as string;
-				
+
 				// Extract resource name from locator
 				const resource = resourceLocator.value || resourceLocator;
-				
+
 				if (!resource || resource.startsWith('__category_')) {
 					throw new Error('Please select a valid resource (not a category header)');
 				}
@@ -287,41 +338,40 @@ export class TwentyUniversal implements INodeType {
 						const createData = this.getNodeParameter('data', i) as IDataObject;
 						responseData = await twentyApiRequest.call(this, 'POST', endpoint, { data: createData });
 						break;
-						
+
 					case 'createMany':
 						const batchData = this.getNodeParameter('data', i) as IDataObject[];
 						responseData = await twentyApiRequest.call(this, 'POST', `${endpoint}/batch`, { data: batchData });
 						break;
-						
+
 					case 'update':
 						const updateId = this.getNodeParameter('id', i) as string;
 						const updateData = this.getNodeParameter('data', i) as IDataObject;
 						responseData = await twentyApiRequest.call(this, 'PATCH', `${endpoint}/${updateId}`, { data: updateData });
 						break;
-						
+
 					case 'get':
 						const getId = this.getNodeParameter('id', i) as string;
 						responseData = await twentyApiRequest.call(this, 'GET', `${endpoint}/${getId}`);
 						break;
-						
-					case 'getMany':
-						const limit = this.getNodeParameter('limit', i, 20) as number;
+
+										case 'getMany':
+						const limit = this.getNodeParameter('limit', i, 50) as number;
 						const filter = this.getNodeParameter('filter', i, '{}') as string;
 						const orderBy = this.getNodeParameter('orderBy', i, '{}') as string;
-						
-						const queryParams = new URLSearchParams();
-						queryParams.append('limit', limit.toString());
-						if (filter !== '{}') queryParams.append('filter', filter);
-						if (orderBy !== '{}') queryParams.append('orderBy', orderBy);
-						
-						responseData = await twentyApiRequest.call(this, 'GET', `${endpoint}?${queryParams.toString()}`);
+
+						let queryString = `limit=${limit}`;
+						if (filter !== '{}') queryString += `&filter=${encodeURIComponent(filter)}`;
+						if (orderBy !== '{}') queryString += `&orderBy=${encodeURIComponent(orderBy)}`;
+
+						responseData = await twentyApiRequest.call(this, 'GET', `${endpoint}?${queryString}`);
 						break;
-						
+
 					case 'delete':
 						const deleteId = this.getNodeParameter('id', i) as string;
 						responseData = await twentyApiRequest.call(this, 'DELETE', `${endpoint}/${deleteId}`);
 						break;
-						
+
 					default:
 						throw new Error(`Unknown operation: ${operation}`);
 				}
