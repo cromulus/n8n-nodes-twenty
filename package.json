@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-twenty",
-  "version": "0.0.4",
-  "description": "Comprehensive n8n community node for Twenty CRM - manage companies, contacts, opportunities, tasks, notes, and more with full CRUD operations and AI tool capabilities",
+  "version": "1.1.0",
+  "description": "Consolidated n8n community nodes for Twenty CRM 1.0 - 4 powerful AI-compatible nodes for CRM Core, Tasks & Sales, Communications, and System Management with full CRUD operations",
   "keywords": [
     "n8n-community-node-package"
   ],
@@ -38,6 +38,11 @@
       "dist/credentials/TwentyApi.credentials.js"
     ],
     "nodes": [
+      "dist/nodes/TwentyUniversal/TwentyUniversal.node.js",
+      "dist/nodes/TwentyCrmCore/TwentyCrmCore.node.js",
+      "dist/nodes/TwentyTasksSales/TwentyTasksSales.node.js",
+      "dist/nodes/TwentyCommunications/TwentyCommunications.node.js",
+      "dist/nodes/TwentySystem/TwentySystem.node.js",
       "dist/nodes/Twenty/Twenty.node.js"
     ]
   },

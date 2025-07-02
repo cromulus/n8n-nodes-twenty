@@ -1,0 +1,241 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TwentyTasksSales = void 0;
+const GenericFunctions_1 = require("../Twenty/GenericFunctions");
+class TwentyTasksSales {
+    constructor() {
+        this.description = {
+            displayName: 'Twenty Tasks & Sales',
+            name: 'twentyTasksSales',
+            icon: 'file:twenty.svg',
+            group: ['transform'],
+            version: 1,
+            subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
+            description: 'Manage sales pipeline and task management: opportunities, tasks, notes, and targets. Ideal for AI agents handling deal tracking, task automation, and sales activity management with full CRUD operations.',
+            usableAsTool: true,
+            defaults: {
+                name: 'Twenty Tasks & Sales',
+            },
+            inputs: ['main'],
+            outputs: ['main'],
+            credentials: [
+                {
+                    name: 'twentyApi',
+                    required: true,
+                },
+            ],
+            properties: [
+                {
+                    displayName: 'Resource',
+                    name: 'resource',
+                    type: 'options',
+                    noDataExpression: true,
+                    options: [
+                        {
+                            name: 'Opportunity',
+                            value: 'opportunity',
+                            description: 'Manage sales opportunities and deals in your pipeline',
+                        },
+                        {
+                            name: 'Task',
+                            value: 'task',
+                            description: 'Manage tasks and to-do items',
+                        },
+                        {
+                            name: 'Note',
+                            value: 'note',
+                            description: 'Manage notes and documentation',
+                        },
+                        {
+                            name: 'Task Target',
+                            value: 'taskTarget',
+                            description: 'Manage task associations with other entities',
+                        },
+                        {
+                            name: 'Note Target',
+                            value: 'noteTarget',
+                            description: 'Manage note associations with other entities',
+                        },
+                    ],
+                    default: 'opportunity',
+                },
+                {
+                    displayName: 'Operation',
+                    name: 'operation',
+                    type: 'options',
+                    noDataExpression: true,
+                    options: [
+                        {
+                            name: 'Create',
+                            value: 'create',
+                            description: 'Create a new record',
+                            action: 'Create record',
+                        },
+                        {
+                            name: 'Create Many',
+                            value: 'createMany',
+                            description: 'Create multiple records in batch',
+                            action: 'Create many records',
+                        },
+                        {
+                            name: 'Update',
+                            value: 'update',
+                            description: 'Update an existing record',
+                            action: 'Update record',
+                        },
+                        {
+                            name: 'Get',
+                            value: 'get',
+                            description: 'Get a record by ID',
+                            action: 'Get record',
+                        },
+                        {
+                            name: 'Get Many',
+                            value: 'getMany',
+                            description: 'Find multiple records with filtering and sorting',
+                            action: 'Get many records',
+                        },
+                        {
+                            name: 'Delete',
+                            value: 'delete',
+                            description: 'Delete a record',
+                            action: 'Delete record',
+                        },
+                    ],
+                    default: 'get',
+                },
+                {
+                    displayName: 'ID',
+                    name: 'id',
+                    type: 'string',
+                    required: true,
+                    displayOptions: {
+                        show: {
+                            operation: ['get', 'update', 'delete'],
+                        },
+                    },
+                    default: '',
+                    description: 'The ID of the record to operate on',
+                },
+                {
+                    displayName: 'Data',
+                    name: 'data',
+                    type: 'json',
+                    displayOptions: {
+                        show: {
+                            operation: ['create', 'update', 'createMany'],
+                        },
+                    },
+                    default: '{}',
+                    description: 'Record data in JSON format',
+                },
+                {
+                    displayName: 'Limit',
+                    name: 'limit',
+                    type: 'number',
+                    displayOptions: {
+                        show: {
+                            operation: ['getMany'],
+                        },
+                    },
+                    typeOptions: {
+                        minValue: 1,
+                        maxValue: 100,
+                    },
+                    default: 20,
+                    description: 'Maximum number of records to return',
+                },
+                {
+                    displayName: 'Filter',
+                    name: 'filter',
+                    type: 'json',
+                    displayOptions: {
+                        show: {
+                            operation: ['getMany'],
+                        },
+                    },
+                    default: '{}',
+                    description: 'JSON filter object for querying records',
+                },
+            ],
+        };
+    }
+    async execute() {
+        const items = this.getInputData();
+        const returnData = [];
+        for (let i = 0; i < items.length; i++) {
+            try {
+                const resource = this.getNodeParameter('resource', i);
+                const operation = this.getNodeParameter('operation', i);
+                let responseData = {};
+                let endpoint = '';
+                switch (resource) {
+                    case 'opportunity':
+                        endpoint = '/opportunities';
+                        break;
+                    case 'task':
+                        endpoint = '/tasks';
+                        break;
+                    case 'note':
+                        endpoint = '/notes';
+                        break;
+                    case 'taskTarget':
+                        endpoint = '/taskTargets';
+                        break;
+                    case 'noteTarget':
+                        endpoint = '/noteTargets';
+                        break;
+                    default:
+                        throw new Error(`Unknown resource: ${resource}`);
+                }
+                switch (operation) {
+                    case 'create':
+                        const createData = this.getNodeParameter('data', i);
+                        responseData = await GenericFunctions_1.twentyApiRequest.call(this, 'POST', endpoint, { data: createData });
+                        break;
+                    case 'createMany':
+                        const batchData = this.getNodeParameter('data', i);
+                        responseData = await GenericFunctions_1.twentyApiRequest.call(this, 'POST', `${endpoint}/batch`, { data: batchData });
+                        break;
+                    case 'update':
+                        const updateId = this.getNodeParameter('id', i);
+                        const updateData = this.getNodeParameter('data', i);
+                        responseData = await GenericFunctions_1.twentyApiRequest.call(this, 'PATCH', `${endpoint}/${updateId}`, { data: updateData });
+                        break;
+                    case 'get':
+                        const getId = this.getNodeParameter('id', i);
+                        responseData = await GenericFunctions_1.twentyApiRequest.call(this, 'GET', `${endpoint}/${getId}`);
+                        break;
+                    case 'getMany':
+                        const limit = this.getNodeParameter('limit', i, 20);
+                        const filter = this.getNodeParameter('filter', i, '{}');
+                        const queryParams = new URLSearchParams();
+                        queryParams.append('limit', limit.toString());
+                        if (filter !== '{}')
+                            queryParams.append('filter', filter);
+                        responseData = await GenericFunctions_1.twentyApiRequest.call(this, 'GET', `${endpoint}?${queryParams.toString()}`);
+                        break;
+                    case 'delete':
+                        const deleteId = this.getNodeParameter('id', i);
+                        responseData = await GenericFunctions_1.twentyApiRequest.call(this, 'DELETE', `${endpoint}/${deleteId}`);
+                        break;
+                    default:
+                        throw new Error(`Unknown operation: ${operation}`);
+                }
+                const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(responseData), { itemData: { item: i } });
+                returnData.push(...executionData);
+            }
+            catch (error) {
+                if (this.continueOnFail()) {
+                    const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray({ error: error.message }), { itemData: { item: i } });
+                    returnData.push(...executionData);
+                    continue;
+                }
+                throw error;
+            }
+        }
+        return [returnData];
+    }
+}
+exports.TwentyTasksSales = TwentyTasksSales;
+//# sourceMappingURL=TwentyTasksSales.node.js.map

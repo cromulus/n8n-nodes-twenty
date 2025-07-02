@@ -1,0 +1,4 @@
+{
+	"node": "dist/nodes/TwentyCrmCore/TwentyCrmCore.node.js",
+	"nodeVersion": "1.0"
+}

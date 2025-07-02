@@ -87,14 +87,15 @@ import {
 
 export class Twenty implements INodeType {
 	description: INodeTypeDescription & { usableAsTool?: boolean } = {
-		displayName: 'Twenty CRM',
+		displayName: 'Twenty CRM (Legacy)',
 		name: 'twenty',
 		icon: 'file:twenty.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Comprehensive CRM operations for Twenty - manage companies, contacts, deals, tasks, notes, and more. Supports full CRUD operations with advanced filtering, sorting, and relationship management.',
+		description: '[DEPRECATED] Legacy comprehensive CRM node. Use the new consolidated nodes instead: Twenty CRM Core, Twenty Tasks & Sales, Twenty Communications, and Twenty System for better AI compatibility and focused functionality.',
 		usableAsTool: true,
+		hidden: true,
 		defaults: {
 			name: 'Twenty CRM',
 		},

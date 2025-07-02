@@ -1,0 +1,4 @@
+{
+	"node": "dist/nodes/TwentyCommunications/TwentyCommunications.node.js",
+	"nodeVersion": "1.0"
+}
