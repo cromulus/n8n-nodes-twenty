@@ -58,7 +58,5 @@
     "peerDependencies": {
         "n8n-workflow": "*"
     },
-    "dependencies": {
-        "zod": "^3.25.67"
-    }
+    "dependencies": {}
 }

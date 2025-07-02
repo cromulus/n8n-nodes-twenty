@@ -5,29 +5,47 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { z } from 'zod';
-
 import { twentyApiRequest } from '../Twenty/GenericFunctions';
 
-// Zod schemas for AI Tool input validation - Communications
-const communicationsResourceEnum = z.enum([
-	'message',
-	'messageThread',
-	'messageChannel',
-	'calendarEvent',
-	'calendarChannel',
-	'timelineActivity'
-]);
-const operationEnum = z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
-
-const inputSchema = z.object({
-	resource: communicationsResourceEnum.describe('The communications resource type to operate on'),
-	operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
-	id: z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
-	data: z.union([z.record(z.any()), z.array(z.record(z.any()))]).optional().describe('Record data as JSON object or array of objects (required for create, update, createMany operations)'),
-	limit: z.number().min(1).max(100).optional().describe('Maximum number of records to return for getMany (1-100, default: 50)'),
-	filter: z.record(z.any()).optional().describe('Filter conditions as JSON object for getMany operation'),
-});
+// JSON Schema for AI Tool input validation (n8n expects JSON Schema, not Zod)
+const inputSchema = {
+	type: 'object',
+	properties: {
+		resource: {
+			type: 'string',
+			enum: ['message', 'messageThread', 'messageChannel', 'calendarEvent', 'calendarChannel', 'timelineActivity'],
+			description: 'The communications resource type to operate on'
+		},
+		operation: {
+			type: 'string',
+			enum: ['create', 'createMany', 'update', 'get', 'getMany', 'delete'],
+			description: 'The operation to perform: create, createMany, update, get, getMany, or delete'
+		},
+		id: {
+			type: 'string',
+			description: 'The unique ID of the record (required for get, update, delete operations)'
+		},
+		data: {
+			oneOf: [
+				{ type: 'object' },
+				{ type: 'array', items: { type: 'object' } }
+			],
+			description: 'Record data as JSON object or array of objects (required for create, update, createMany operations)'
+		},
+		limit: {
+			type: 'number',
+			minimum: 1,
+			maximum: 100,
+			description: 'Maximum number of records to return for getMany (1-100, default: 50)'
+		},
+		filter: {
+			type: 'object',
+			description: 'Filter conditions as JSON object for getMany operation'
+		}
+	},
+	required: ['resource', 'operation'],
+	additionalProperties: false
+};
 
 export class TwentyCommunications implements INodeType {
 	description: INodeTypeDescription & { usableAsTool?: boolean; schema?: any } = {

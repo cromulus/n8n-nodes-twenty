@@ -1,56 +1,104 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwentyTasksSales = void 0;
-const zod_1 = require("zod");
 const GenericFunctions_1 = require("../Twenty/GenericFunctions");
-const tasksSalesResourceEnum = zod_1.z.enum(['opportunity', 'task', 'note', 'taskTarget', 'noteTarget']);
-const operationEnum = zod_1.z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
-const opportunitySchema = zod_1.z.object({
-    name: zod_1.z.string().describe('Opportunity name'),
-    amount: zod_1.z.number().optional().describe('Deal amount/value'),
-    stage: zod_1.z.string().optional().describe('Sales stage (e.g., PROSPECTING, MEETING, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST)'),
-    probability: zod_1.z.number().min(0).max(100).optional().describe('Win probability percentage (0-100)'),
-    expectedCloseDate: zod_1.z.string().optional().describe('Expected close date (ISO format)'),
-    description: zod_1.z.string().optional().describe('Opportunity description'),
-    companyId: zod_1.z.string().optional().describe('Associated company ID'),
-    personId: zod_1.z.string().optional().describe('Associated person/contact ID'),
-    ownerId: zod_1.z.string().optional().describe('Opportunity owner/responsible person ID'),
-}).describe('Opportunity/deal record data');
-const taskSchema = zod_1.z.object({
-    title: zod_1.z.string().describe('Task title'),
-    body: zod_1.z.string().optional().describe('Task description/body'),
-    status: zod_1.z.string().optional().describe('Task status (e.g., TODO, IN_PROGRESS, DONE)'),
-    dueAt: zod_1.z.string().optional().describe('Due date/time (ISO format)'),
-    assigneeId: zod_1.z.string().optional().describe('Assigned person ID'),
-    authorId: zod_1.z.string().optional().describe('Task creator ID'),
-    position: zod_1.z.number().optional().describe('Task position/order'),
-}).describe('Task record data');
-const noteSchema = zod_1.z.object({
-    title: zod_1.z.string().describe('Note title'),
-    body: zod_1.z.string().optional().describe('Note content/body'),
-    authorId: zod_1.z.string().optional().describe('Note author ID'),
-    position: zod_1.z.number().optional().describe('Note position/order'),
-}).describe('Note record data');
-const targetSchema = zod_1.z.object({
-    targetId: zod_1.z.string().describe('Target entity ID'),
-    taskId: zod_1.z.string().optional().describe('Associated task ID (for taskTarget)'),
-    noteId: zod_1.z.string().optional().describe('Associated note ID (for noteTarget)'),
-}).describe('Target association data');
-const dataSchema = zod_1.z.union([
-    opportunitySchema,
-    taskSchema,
-    noteSchema,
-    targetSchema,
-    zod_1.z.array(zod_1.z.union([opportunitySchema, taskSchema, noteSchema, targetSchema]))
-]).optional().describe('Record data - structure varies by resource type');
-const inputSchema = zod_1.z.object({
-    resource: tasksSalesResourceEnum.describe('The tasks/sales resource type to operate on'),
-    operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
-    id: zod_1.z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
-    data: dataSchema,
-    limit: zod_1.z.number().min(1).max(100).optional().describe('Maximum number of records to return for getMany (1-100, default: 50)'),
-    filter: zod_1.z.record(zod_1.z.any()).optional().describe('Filter conditions as JSON object for getMany operation'),
-});
+const opportunitySchema = {
+    type: 'object',
+    properties: {
+        name: { type: 'string', description: 'Opportunity name' },
+        amount: { type: 'number', description: 'Deal amount/value' },
+        stage: { type: 'string', description: 'Sales stage (e.g., PROSPECTING, MEETING, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST)' },
+        probability: { type: 'number', minimum: 0, maximum: 100, description: 'Win probability percentage (0-100)' },
+        expectedCloseDate: { type: 'string', description: 'Expected close date (ISO format)' },
+        description: { type: 'string', description: 'Opportunity description' },
+        companyId: { type: 'string', description: 'Associated company ID' },
+        personId: { type: 'string', description: 'Associated person/contact ID' },
+        ownerId: { type: 'string', description: 'Opportunity owner/responsible person ID' }
+    },
+    required: ['name'],
+    additionalProperties: false
+};
+const taskSchema = {
+    type: 'object',
+    properties: {
+        title: { type: 'string', description: 'Task title' },
+        body: { type: 'string', description: 'Task description/body' },
+        status: { type: 'string', description: 'Task status (e.g., TODO, IN_PROGRESS, DONE)' },
+        dueAt: { type: 'string', description: 'Due date/time (ISO format)' },
+        assigneeId: { type: 'string', description: 'Assigned person ID' },
+        authorId: { type: 'string', description: 'Task creator ID' },
+        position: { type: 'number', description: 'Task position/order' }
+    },
+    required: ['title'],
+    additionalProperties: false
+};
+const noteSchema = {
+    type: 'object',
+    properties: {
+        title: { type: 'string', description: 'Note title' },
+        body: { type: 'string', description: 'Note content/body' },
+        authorId: { type: 'string', description: 'Note author ID' },
+        position: { type: 'number', description: 'Note position/order' }
+    },
+    required: ['title'],
+    additionalProperties: false
+};
+const targetSchema = {
+    type: 'object',
+    properties: {
+        targetId: { type: 'string', description: 'Target entity ID' },
+        taskId: { type: 'string', description: 'Associated task ID (for taskTarget)' },
+        noteId: { type: 'string', description: 'Associated note ID (for noteTarget)' }
+    },
+    required: ['targetId'],
+    additionalProperties: false
+};
+const inputSchema = {
+    type: 'object',
+    properties: {
+        resource: {
+            type: 'string',
+            enum: ['opportunity', 'task', 'note', 'taskTarget', 'noteTarget'],
+            description: 'The tasks/sales resource type to operate on'
+        },
+        operation: {
+            type: 'string',
+            enum: ['create', 'createMany', 'update', 'get', 'getMany', 'delete'],
+            description: 'The operation to perform: create, createMany, update, get, getMany, or delete'
+        },
+        id: {
+            type: 'string',
+            description: 'The unique ID of the record (required for get, update, delete operations)'
+        },
+        data: {
+            oneOf: [
+                opportunitySchema,
+                taskSchema,
+                noteSchema,
+                targetSchema,
+                {
+                    type: 'array',
+                    items: {
+                        oneOf: [opportunitySchema, taskSchema, noteSchema, targetSchema]
+                    }
+                }
+            ],
+            description: 'Record data - structure varies by resource type'
+        },
+        limit: {
+            type: 'number',
+            minimum: 1,
+            maximum: 100,
+            description: 'Maximum number of records to return for getMany (1-100, default: 50)'
+        },
+        filter: {
+            type: 'object',
+            description: 'Filter conditions as JSON object for getMany operation'
+        }
+    },
+    required: ['resource', 'operation'],
+    additionalProperties: false
+};
 class TwentyTasksSales {
     constructor() {
         this.description = {

@@ -1,18 +1,45 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwentyCrmCore = void 0;
-const zod_1 = require("zod");
 const GenericFunctions_1 = require("../Twenty/GenericFunctions");
 const ResourceDiscovery_1 = require("../Twenty/ResourceDiscovery");
-const operationEnum = zod_1.z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
-const inputSchema = zod_1.z.object({
-    resource: zod_1.z.string().describe('The CRM resource type to operate on (e.g., companies, people, attachments)'),
-    operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
-    id: zod_1.z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
-    data: zod_1.z.union([zod_1.z.record(zod_1.z.any()), zod_1.z.array(zod_1.z.record(zod_1.z.any()))]).optional().describe('Record data as JSON object or array of objects (required for create, update, createMany operations)'),
-    limit: zod_1.z.number().min(1).max(100).optional().describe('Maximum number of records to return for getMany (1-100, default: 50)'),
-    filter: zod_1.z.record(zod_1.z.any()).optional().describe('Filter conditions as JSON object for getMany operation'),
-});
+const inputSchema = {
+    type: 'object',
+    properties: {
+        resource: {
+            type: 'string',
+            description: 'The CRM resource type to operate on (e.g., companies, people, attachments)'
+        },
+        operation: {
+            type: 'string',
+            enum: ['create', 'createMany', 'update', 'get', 'getMany', 'delete'],
+            description: 'The operation to perform: create, createMany, update, get, getMany, or delete'
+        },
+        id: {
+            type: 'string',
+            description: 'The unique ID of the record (required for get, update, delete operations)'
+        },
+        data: {
+            oneOf: [
+                { type: 'object' },
+                { type: 'array', items: { type: 'object' } }
+            ],
+            description: 'Record data as JSON object or array of objects (required for create, update, createMany operations)'
+        },
+        limit: {
+            type: 'number',
+            minimum: 1,
+            maximum: 100,
+            description: 'Maximum number of records to return for getMany (1-100, default: 50)'
+        },
+        filter: {
+            type: 'object',
+            description: 'Filter conditions as JSON object for getMany operation'
+        }
+    },
+    required: ['resource', 'operation'],
+    additionalProperties: false
+};
 class TwentyCrmCore {
     constructor() {
         this.description = {
