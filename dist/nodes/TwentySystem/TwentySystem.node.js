@@ -11,46 +11,15 @@ const systemResourceEnum = zod_1.z.enum([
     'connectedAccount',
     'workspaceMember'
 ]);
-const createSchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to create'),
-    operation: zod_1.z.literal('create').describe('Create a new record'),
-    data: zod_1.z.record(zod_1.z.any()).describe('Record data as JSON object with the fields to create'),
+const operationEnum = zod_1.z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
+const inputSchema = zod_1.z.object({
+    resource: systemResourceEnum.describe('The system resource type to operate on'),
+    operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
+    id: zod_1.z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
+    data: zod_1.z.union([zod_1.z.record(zod_1.z.any()), zod_1.z.array(zod_1.z.record(zod_1.z.any()))]).optional().describe('Record data as JSON object or array of objects (required for create, update, createMany operations)'),
+    limit: zod_1.z.number().min(1).max(100).optional().describe('Maximum number of records to return for getMany (1-100, default: 50)'),
+    filter: zod_1.z.record(zod_1.z.any()).optional().describe('Filter conditions as JSON object for getMany operation'),
 });
-const createManySchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to create multiple records for'),
-    operation: zod_1.z.literal('createMany').describe('Create multiple records in batch'),
-    data: zod_1.z.array(zod_1.z.record(zod_1.z.any())).describe('Array of record data objects to create'),
-});
-const updateSchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to update'),
-    operation: zod_1.z.literal('update').describe('Update an existing record'),
-    id: zod_1.z.string().describe('The unique ID of the record to update'),
-    data: zod_1.z.record(zod_1.z.any()).describe('Record data as JSON object with the fields to update'),
-});
-const getSchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to retrieve'),
-    operation: zod_1.z.literal('get').describe('Get a single record by ID'),
-    id: zod_1.z.string().describe('The unique ID of the record to retrieve'),
-});
-const getManySchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to query'),
-    operation: zod_1.z.literal('getMany').describe('Query multiple records with filtering and sorting'),
-    limit: zod_1.z.number().min(1).max(100).optional().describe('Maximum number of records to return (1-100, default: 50)'),
-    filter: zod_1.z.record(zod_1.z.any()).optional().describe('Filter conditions as JSON object'),
-});
-const deleteSchema = zod_1.z.object({
-    resource: systemResourceEnum.describe('The system resource type to delete from'),
-    operation: zod_1.z.literal('delete').describe('Delete a record by ID'),
-    id: zod_1.z.string().describe('The unique ID of the record to delete'),
-});
-const inputSchema = zod_1.z.discriminatedUnion('operation', [
-    createSchema,
-    createManySchema,
-    updateSchema,
-    getSchema,
-    getManySchema,
-    deleteSchema,
-]);
 class TwentySystem {
     constructor() {
         this.description = {

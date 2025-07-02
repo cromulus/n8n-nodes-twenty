@@ -14,53 +14,16 @@ import { twentyApiRequest } from '../Twenty/GenericFunctions';
 import { ResourceDiscovery } from '../Twenty/ResourceDiscovery';
 
 // Zod schemas for AI Tool input validation - CRM Core
-const createSchema = z.object({
-	resource: z.string().describe('The CRM resource type to create (e.g., companies, people, attachments)'),
-	operation: z.literal('create').describe('Create a new record'),
-	data: z.record(z.any()).describe('Record data as JSON object with the fields to create'),
-});
+const operationEnum = z.enum(['create', 'createMany', 'update', 'get', 'getMany', 'delete']);
 
-const createManySchema = z.object({
-	resource: z.string().describe('The CRM resource type to create multiple records for'),
-	operation: z.literal('createMany').describe('Create multiple records in batch'),
-	data: z.array(z.record(z.any())).describe('Array of record data objects to create'),
+const inputSchema = z.object({
+	resource: z.string().describe('The CRM resource type to operate on (e.g., companies, people, attachments)'),
+	operation: operationEnum.describe('The operation to perform: create, createMany, update, get, getMany, or delete'),
+	id: z.string().optional().describe('The unique ID of the record (required for get, update, delete operations)'),
+	data: z.union([z.record(z.any()), z.array(z.record(z.any()))]).optional().describe('Record data as JSON object or array of objects (required for create, update, createMany operations)'),
+	limit: z.number().min(1).max(100).optional().describe('Maximum number of records to return for getMany (1-100, default: 50)'),
+	filter: z.record(z.any()).optional().describe('Filter conditions as JSON object for getMany operation'),
 });
-
-const updateSchema = z.object({
-	resource: z.string().describe('The CRM resource type to update'),
-	operation: z.literal('update').describe('Update an existing record'),
-	id: z.string().describe('The unique ID of the record to update'),
-	data: z.record(z.any()).describe('Record data as JSON object with the fields to update'),
-});
-
-const getSchema = z.object({
-	resource: z.string().describe('The CRM resource type to retrieve'),
-	operation: z.literal('get').describe('Get a single record by ID'),
-	id: z.string().describe('The unique ID of the record to retrieve'),
-});
-
-const getManySchema = z.object({
-	resource: z.string().describe('The CRM resource type to query'),
-	operation: z.literal('getMany').describe('Query multiple records with filtering and sorting'),
-	limit: z.number().min(1).max(100).optional().describe('Maximum number of records to return (1-100, default: 50)'),
-	filter: z.record(z.any()).optional().describe('Filter conditions as JSON object'),
-});
-
-const deleteSchema = z.object({
-	resource: z.string().describe('The CRM resource type to delete from'),
-	operation: z.literal('delete').describe('Delete a record by ID'),
-	id: z.string().describe('The unique ID of the record to delete'),
-});
-
-// Union schema for CRM Core operations
-const inputSchema = z.discriminatedUnion('operation', [
-	createSchema,
-	createManySchema,
-	updateSchema,
-	getSchema,
-	getManySchema,
-	deleteSchema,
-]);
 
 export class TwentyCrmCore implements INodeType {
 	description: INodeTypeDescription & { usableAsTool?: boolean; schema?: any } = {
@@ -295,7 +258,7 @@ export class TwentyCrmCore implements INodeType {
 						responseData = await twentyApiRequest.call(this, 'GET', `${endpoint}/${getId}`);
 						break;
 
-										case 'getMany':
+					case 'getMany':
 						const limit = this.getNodeParameter('limit', i, 50) as number;
 						const filter = this.getNodeParameter('filter', i, '{}') as string;
 
